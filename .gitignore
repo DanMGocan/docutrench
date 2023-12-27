@@ -1,0 +1,6 @@
+config.py
+venv/
+attachments/
+emails_txt/
+docutrenchservicekey.json
+__pycache__/
