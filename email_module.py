@@ -1,8 +1,10 @@
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
+
 import os
 import io
 import base64
+import time
 
 # Path to your service account key file
 SERVICE_ACCOUNT_FILE = 'docutrenchservicekey.json'
@@ -64,14 +66,13 @@ def get_attachment(service, user_id, message_id, attachment_id):
     return file_data
 
 def delete_message(service, user_id, message_id):
-    pass
-    # try:
-    #     service.users().messages().delete(userId=user_id, id=message_id).execute()
-    #     print(f"Deleted message {message_id}")
-    # except Exception as e:
-    #     print(f"An error occurred: {e}")
+    try:
+        service.users().messages().delete(userId=user_id, id=message_id).execute()
+        print(f"Deleted message {message_id}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
-def list_messages_and_process(service, user_id='me', store_dir='attachments', txt_dir='emails_txt'):
+def list_messages_and_process(service, user_id='dan@docutrench.com', store_dir='attachments', txt_dir='emails_txt'):
     # Ensure the directories exist
     os.makedirs(store_dir, exist_ok=True)
     os.makedirs(txt_dir, exist_ok=True)
@@ -87,8 +88,9 @@ def list_messages_and_process(service, user_id='me', store_dir='attachments', tx
             msg_id = message['id']
             email_details = get_email_details(service, user_id, msg_id, store_dir, txt_dir)
             print(f"Email details saved to {email_details['txt_filename']}")
-
             delete_message(service, user_id, msg_id)
+            print(f"Email deleted. Sleeping for a second")
+            time.sleep(1)
 
     return messages
 
@@ -96,4 +98,8 @@ def list_messages_and_process(service, user_id='me', store_dir='attachments', tx
 
 # Authenticate and process messages
 service = gmail_authenticate()
-list_messages_and_process(service)
+
+while True: 
+    list_messages_and_process(service)
+    print("Module ran, sleeping!")
+    time.sleep(5)
